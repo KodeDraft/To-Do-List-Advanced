@@ -102,25 +102,3 @@ export default function Header({ navigation, rightIconOnPress }) {
     </>
   );
 }
-
-const headerStyles = StyleSheet.create({
-  headerContainer: {
-    backgroundColor: "black",
-    height: "13%",
-    width: "100%",
-  },
-  sameRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: "12%",
-  },
-  headerTitle: {
-    color: "white",
-    fontSize: 40,
-  },
-  btn: {
-    backgroundColor: "red",
-    width: 50,
-    paddingRight: 20,
-  },
-});

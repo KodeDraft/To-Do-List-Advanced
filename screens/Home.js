@@ -10,7 +10,7 @@ import {
 } from "react-native";
 // FIREBASE
 import { getAuth } from "firebase/auth";
-import Header from "../components/Header";
+
 // ICONS
 import { Ionicons } from "@expo/vector-icons";
 // STYLES
@@ -24,62 +24,54 @@ import { FlatHeader } from "react-native-flat-header";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
-  // VARIABLES
+  // FUNCTIONS
+  const getTheme = async () => {
+    try {
+      const value = await AsyncStorage.getItem("theme");
+      if (value !== null) {
+        setTheme(value);
+      }
+    } catch (error) {
+      // Error retrieving data
+      console.log("Error Retriving From Asyn Storage", error);
+    }
+  };
 
-  // THEME PROPERTIES
-  // const [theme, setTheme] = useState("light");
-  const [headerBackground, setHeaderBackground] = useState("#000");
-  const [headerContentColor, setHeaderContentColor] = useState();
-  // SWITCH
-  const [isEnabled, setIsEnabled] = useState(false);
+  /* HEADER FUNCTIONS */
+  /* HEADER FUNCTIONS */
 
-  // FIREBASE AUTH
-  const auth = getAuth();
-  const user = auth.currentUser;
-
-  // THEME PROPERTIES
-  const [theme, setTheme] = useState();
-
-  // JSK FUNCTION => HEADER
-  function Header({ navigation, rightIconOnPress }) {
-    //   FUNCTIONS
-
-    //   GETTING THE THEME FROM ASYNC STORAGE FUNCTION
-    const getTheme = async () => {
-      try {
-        const value = await AsyncStorage.getItem("theme");
-        if (value !== null) {
-          setHeaderBackground(value == "dark" ? "#000" : "#fff");
-          setHeaderContentColor(value == "dark" ? "#fff" : "#000");
-          if (value == "dark") {
-            setIsEnabled(true);
-          } else {
-            setIsEnabled(false);
-          }
+  const getHeaderTheme = async () => {
+    try {
+      const value = await AsyncStorage.getItem("theme");
+      if (value !== null) {
+        setHeaderBackground(value == "dark" ? "#000" : "#fff");
+        setHeaderContentColor(value == "dark" ? "#fff" : "#000");
+        if (value == "dark") {
+          setIsEnabled(true);
+        } else {
+          setIsEnabled(false);
         }
-      } catch (error) {
-        // Error retrieving data
       }
-    };
-    //   TOGGLING THE SWITCH
-    const toggleSwitch = () => {
-      setIsEnabled((previousState) => !previousState);
-      if (theme == "light") {
-        setTheme("dark");
-        AsyncStorage.setItem("theme", "light");
-      } else {
-        setTheme("light");
-        AsyncStorage.setItem("theme", "dark");
-      }
-    };
+    } catch (error) {
+      // Error retrieving data
+    }
+  };
+  // TOGGLING THE SWITCH
+  const toggleSwitch = () => {
+    setIsEnabled((previousState) => !previousState);
+    if (theme == "light") {
+      setTheme("dark");
+      AsyncStorage.setItem("theme", "dark");
+    } else {
+      setTheme("light");
+      AsyncStorage.setItem("theme", "light");
+    }
+  };
 
-    // VARIABLES
+  /* MAIN HEADER COMPONENT */
+  /* MAIN HEADER COMPONENT */
 
-    // GETTING THEME FROM ASYC STORAGE ALWAYS
-    // useEffect(() => {
-    //   getTheme();
-    // }, [theme]);
-
+  function Header({ navigation, rightIconOnPress }) {
     //   JSK
     return (
       <>
@@ -121,52 +113,39 @@ export default function Home() {
     );
   }
 
-  useEffect(async () => {
-    try {
-      const value = await AsyncStorage.getItem("theme");
-      if (value !== null) {
-        // setTheme(value);
-        console.log(value);
-      }
-    } catch (error) {
-      // Error retrieving data
-      // setTheme("light");
-    }
+  /* VARIABLES */
+  /* VARIABLES */
+
+  // HEADER VARIABLES
+  // THEME PROPERTIES
+  const [headerBackground, setHeaderBackground] = useState("#000");
+  const [headerContentColor, setHeaderContentColor] = useState("#fff");
+
+  // SWITCH
+  const [isEnabled, setIsEnabled] = useState(false);
+
+  // FIREBASE AUTH
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  // THEME PROPERTIES
+  const [theme, setTheme] = useState();
+
+  // USE EFFECTS
+  useEffect(() => {
+    getTheme();
+    getHeaderTheme();
   }, [theme]);
-
-  // FUNCTIONS
-
-  // VARIABLES
 
   // JSK
   return (
     <>
       <Header rightIconOnPress={(ev) => console.log(ev)} />
       <View style={theme == "dark" ? darkMode.container : lightMode.container}>
-        <Text>Hello</Text>
+        <Text style={theme == "dark" ? darkMode.txt : lightMode.txt}>
+          Home Screen
+        </Text>
       </View>
     </>
   );
 }
-
-const headerStyles = StyleSheet.create({
-  headerContainer: {
-    backgroundColor: "black",
-    height: "13%",
-    width: "100%",
-  },
-  sameRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: "12%",
-  },
-  headerTitle: {
-    color: "white",
-    fontSize: 40,
-  },
-  btn: {
-    backgroundColor: "red",
-    width: 50,
-    paddingRight: 20,
-  },
-});
