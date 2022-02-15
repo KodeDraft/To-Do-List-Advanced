@@ -65,7 +65,10 @@ export default function Header({ navigation, rightIconOnPress }) {
   //   JSK
   return (
     <>
-      <StatusBar backgroundColor="#009387" barStyle="light-content" />
+      <StatusBar
+        backgroundColor={theme == "dark" ? "#000" : "#fff"}
+        barStyle="light-content"
+      />
       <SafeAreaView>
         <FlatHeader
           leftText={

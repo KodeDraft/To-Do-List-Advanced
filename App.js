@@ -10,6 +10,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 // CONFIG => FIREBASE CONFIG
 import firebaseConfig from "./config/firebaseConfig";
+import CheckScreen from "./CheckScreen";
 // STACKS
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +24,7 @@ export default function App() {
         <Stack.Screen name="SignIn" component={SignIn} />
         <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="CheckScreen" component={CheckScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
