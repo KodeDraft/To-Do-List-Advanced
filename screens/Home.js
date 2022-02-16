@@ -12,6 +12,16 @@ import {
 } from "react-native";
 // FIREBASE
 import { getAuth } from "firebase/auth";
+// FIREBASE
+import {
+  collection,
+  doc,
+  setDoc,
+  addDoc,
+  getFirestore,
+} from "firebase/firestore/lite";
+// CONFIG
+import firebaseConfig from "../config/firebaseConfig";
 // BOTTOM SHEET
 import ActionSheet from "react-native-actions-sheet";
 // CHECKBOX
@@ -34,7 +44,8 @@ export default function Home() {
   useEffect(() => {
     showDate();
     showTime();
-  });
+  }, []);
+
   // SCREEN WITH AND HEIGHT
   const { width } = Dimensions.get("window");
   const { height } = Dimensions.get("screen");
@@ -154,20 +165,42 @@ export default function Home() {
     setHigh(false);
   };
 
-  const addTask = () => {
-    setTasks((prevTasks) => {
-      return [
-        {
-          title: newTaskTitle,
-          desc: newTaskDesc,
-          priority: priority,
-          priorityColor: priorityColor,
-          key: Math.random() * 100,
-        },
-        ...prevTasks,
-      ];
+  const addData = async () => {
+    await addDoc(collection(db, "tasks"), {
+      title: newTaskTitle,
+      desc: newTaskDesc,
+      priority: priority,
+      priorityColor: priorityColor,
+      key: Date.now(),
     });
   };
+
+  const addTask = async () => {
+    console.log("====================================");
+    console.log("Working On it");
+    console.log("====================================");
+  };
+  const getTasks = () => {
+    const colRef = collection(db, "tasks");
+
+    const q = query(colRef, orderBy("createdAt", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+      let recievedTasks = [];
+      snapshot.docs.forEach((doc) => {
+        recievedTasks.push({
+          ...doc.data(),
+          id: doc.id,
+          createdAt: doc.data().createdAt.toDate(),
+        });
+      });
+      setTasks(recievedTasks);
+      console.log("====================================");
+      console.log(recievedTasks);
+      console.log("====================================");
+    });
+  };
+
   // JSK COMPONENTS
 
   /* MAIN HEADER COMPONENT */
@@ -282,9 +315,10 @@ export default function Home() {
   // SWITCH
   const [isEnabled, setIsEnabled] = useState(false);
 
-  // FIREBASE AUTH
-  const auth = getAuth();
-  const user = auth.currentUser;
+  // FIREBASE
+  const auth = getAuth(); //auth
+  const user = auth.currentUser; //auth.currentuser
+  const db = getFirestore(); //getFirestore()
 
   // THEME PROPERTIES
   const [theme, setTheme] = useState();
@@ -300,6 +334,7 @@ export default function Home() {
     <>
       <Header
         rightIconOnPress={() => actionSheetRef.current?.setModalVisible()}
+        // rightIconOnPress={addTask}
       />
       <View style={theme == "dark" ? darkMode.container : lightMode.container}>
         <View style={{ flex: 0, marginTop: 60, marginLeft: 20 }}>
@@ -524,3 +559,21 @@ export default function Home() {
     </>
   );
 }
+
+// REFERENCE
+
+// setTasks((prevTasks) => {
+//   return [
+//     {
+//       title: newTaskTitle,
+//       desc: newTaskDesc,
+//       priority: priority,
+//       priorityColor: priorityColor,
+//       key: Math.random() * 100,
+//     },
+//     ...prevTasks,
+//   ];
+// });
+
+// adding data to the taska array locally
+// adding data to the taska array locally
