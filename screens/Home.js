@@ -19,7 +19,12 @@ import {
   setDoc,
   addDoc,
   getFirestore,
-} from "firebase/firestore/lite";
+  query,
+  orderBy,
+  onSnapshot,
+  where,
+  FieldValue,
+} from "firebase/firestore";
 // CONFIG
 import firebaseConfig from "../config/firebaseConfig";
 // BOTTOM SHEET
@@ -44,6 +49,8 @@ export default function Home() {
   useEffect(() => {
     showDate();
     showTime();
+    getData();
+    getFinishedData();
   }, []);
 
   // SCREEN WITH AND HEIGHT
@@ -165,39 +172,57 @@ export default function Home() {
     setHigh(false);
   };
 
+  const resetForm = () => {
+    setNewTaskTitle("");
+    setNewTaskDesc("");
+    setPriority("");
+    setPriorityColor("");
+  };
   const addData = async () => {
     await addDoc(collection(db, "tasks"), {
       title: newTaskTitle,
       desc: newTaskDesc,
       priority: priority,
       priorityColor: priorityColor,
+      date: fullDate,
+      time: fullTime,
       key: Date.now(),
-    });
+    })
+      .then(() => {
+        closeAddToDo();
+        resetForm();
+        alert("Added Your Task");
+      })
+      .catch((err) => {
+        alert(err);
+      });
   };
-
   const addTask = async () => {
-    console.log("====================================");
-    console.log("Working On it");
-    console.log("====================================");
+    if (newTaskTitle.length < 1) {
+      alert("Enter Task");
+    } else if (newTaskDesc.length < 3) {
+      alert("Task Description Should Be More than 3 Charecters");
+    } else if (priority == null) {
+      alert("Select Priority");
+    } else {
+      addData();
+    }
   };
-  const getTasks = () => {
+  const getData = () => {
+    // COLLECTION REFERENCE
     const colRef = collection(db, "tasks");
+    // QUERING
+    const q = query(colRef, orderBy("key", "desc"));
 
-    const q = query(colRef, orderBy("createdAt", "desc"));
-
+    // GETTING REALTIME DATA
     onSnapshot(q, (snapshot) => {
       let recievedTasks = [];
       snapshot.docs.forEach((doc) => {
         recievedTasks.push({
           ...doc.data(),
-          id: doc.id,
-          createdAt: doc.data().createdAt.toDate(),
         });
       });
       setTasks(recievedTasks);
-      console.log("====================================");
-      console.log(recievedTasks);
-      console.log("====================================");
     });
   };
 
@@ -294,6 +319,7 @@ export default function Home() {
   ]);
 
   // FORM VARIABLES
+
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDesc, setNewTaskDesc] = useState("");
   const [fullDate, setFullDate] = useState();
@@ -449,7 +475,7 @@ export default function Home() {
               {/* TASK TITLE INPUT */}
               <TextInput
                 placeholder="Enter Task Title"
-                placeholderTextColor="#005A9C"
+                placeholderTextColor={theme == "dark" ? "#ff9e1f" : "#005A9C"}
                 style={
                   theme == "dark" ? darkMode.formInput : lightMode.formInput
                 }
@@ -459,7 +485,7 @@ export default function Home() {
               {/* TASK DESC INPUT */}
               <TextInput
                 placeholder="Enter Task Description"
-                placeholderTextColor="#005A9C"
+                placeholderTextColor={theme == "dark" ? "#ff9e1f" : "#005A9C"}
                 style={
                   theme == "dark" ? darkMode.formInput : lightMode.formInput
                 }
@@ -483,35 +509,27 @@ export default function Home() {
                 Current Time: {fullTime}
               </Text>
 
-              <Text style={{ paddingBottom: 10 }}></Text>
-              {/* SETTING PRIORITY */}
-              {/* <Text
-                style={{
-                  color: priorityColor,
-                  paddingBottom: 20,
-                  fontSize: 20,
-                }}
-              >
-                SELECT PRIORITY:
-              </Text> */}
-              <CheckBox
-                title="High"
-                checked={high}
-                checkedColor="#FF0000"
-                onPress={setHighPriority}
-              />
-              <CheckBox
-                title="Medium"
-                checked={medium}
-                checkedColor="#fab802"
-                onPress={setMediumPriority}
-              />
-              <CheckBox
-                title="Low"
-                checked={low}
-                checkedColor="#12a33b"
-                onPress={setLowPriority}
-              />
+              <View style={{ paddingBottom: 10 }} />
+              <View style={{ marginLeft: -10 }}>
+                <CheckBox
+                  title="High"
+                  checked={high}
+                  checkedColor="#FF0000"
+                  onPress={setHighPriority}
+                />
+                <CheckBox
+                  title="Medium"
+                  checked={medium}
+                  checkedColor="#fab802"
+                  onPress={setMediumPriority}
+                />
+                <CheckBox
+                  title="Low"
+                  checked={low}
+                  checkedColor="#12a33b"
+                  onPress={setLowPriority}
+                />
+              </View>
 
               {/* ADDING TASK BUTTON */}
               <TouchableOpacity
@@ -559,21 +577,3 @@ export default function Home() {
     </>
   );
 }
-
-// REFERENCE
-
-// setTasks((prevTasks) => {
-//   return [
-//     {
-//       title: newTaskTitle,
-//       desc: newTaskDesc,
-//       priority: priority,
-//       priorityColor: priorityColor,
-//       key: Math.random() * 100,
-//     },
-//     ...prevTasks,
-//   ];
-// });
-
-// adding data to the taska array locally
-// adding data to the taska array locally

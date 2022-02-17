@@ -14,7 +14,8 @@ const darkMode = StyleSheet.create({
   },
   // ADD TASK MODAL
   addToDoTitle: {
-    color: "#005A9C",
+    // color: "#ff9e1f",
+    color: "#ff9e1f",
     textAlign: "center",
     marginTop: 20,
     fontSize: 35,
@@ -25,8 +26,8 @@ const darkMode = StyleSheet.create({
   },
   formInput: {
     borderWidth: 1,
-    borderColor: "#005A9C",
-    color: "#005A9C",
+    borderColor: "#ff9e1f",
+    color: "#ff9e1f",
     fontWeight: "bold",
     height: 35,
     marginTop: 20,
@@ -34,13 +35,13 @@ const darkMode = StyleSheet.create({
     paddingLeft: 10,
   },
   formLabel: {
-    color: "#005A9C",
+    color: "#ff9e1f",
     textAlign: "left",
     fontSize: 20,
     paddingTop: 20,
   },
   customAddBtn: {
-    backgroundColor: "#005A9C",
+    backgroundColor: "#ff9e1f",
     height: 30,
     marginTop: 20,
     borderRadius: 3,
@@ -71,7 +72,7 @@ const darkMode = StyleSheet.create({
     lineHeight: 30,
   },
   taskPriorityText: {
-    color: "#005A9C",
+    color: "#ff9e1f",
     fontSize: 20,
     fontFamily: "descText",
   },
