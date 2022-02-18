@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createRef, useRef } from "react";
+import React, { useState, useEffect, createRef } from "react";
 // NATIVE IMPORTS
 import {
   View,
@@ -27,6 +27,8 @@ import {
   where,
   FieldValue,
 } from "firebase/firestore";
+// ANIMATION
+import * as Animatable from "react-native-animatable";
 // CONFIG
 import firebaseConfig from "../config/firebaseConfig";
 // BOTTOM SHEET
@@ -38,7 +40,7 @@ import { Ionicons } from "@expo/vector-icons";
 // STYLES
 import darkMode from "../styles/darkMode";
 import lightMode from "../styles/lightMode";
-// STORAGE
+// ASYNC STORAGE
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // HEADER => INSTALLED
 import { FlatHeader } from "react-native-flat-header";
@@ -46,7 +48,6 @@ import { FlatHeader } from "react-native-flat-header";
 import { SafeAreaView } from "react-native-safe-area-context";
 // SWIPE LIST VIEW
 import { SwipeListView } from "react-native-swipe-list-view";
-// AWESOME ALERT => INSTALLED
 
 export default function Home({ navigation }) {
   useEffect(() => {
@@ -57,7 +58,6 @@ export default function Home({ navigation }) {
 
   // SCREEN WITH AND HEIGHT
   const { width } = Dimensions.get("window");
-  const { height } = Dimensions.get("screen");
 
   // FUNCTIONS
   const getTheme = async () => {
@@ -68,7 +68,7 @@ export default function Home({ navigation }) {
       }
     } catch (error) {
       // Error retrieving data
-      console.log("Error Retriving From Asyn Storage", error);
+      alert(error);
     }
   };
 
@@ -199,6 +199,8 @@ export default function Home({ navigation }) {
   const addTask = async () => {
     if (newTaskTitle.length < 1) {
       alert("Enter Task");
+    } else if (newTaskTitle.length > 25) {
+      alert("Task Title Should Be Less Than 25 Charecters");
     } else if (newTaskDesc.length < 3) {
       alert("Task Description Should Be More than 3 Charecters");
     } else if (priority == null) {
@@ -244,13 +246,12 @@ export default function Home({ navigation }) {
     Alert.alert("Are u sure ?", "You want to delete this task", [
       {
         text: "No, Cancel",
-        onPress: () => console.log("Cancel Pressed"),
         style: "cancel",
       },
       {
         text: "Yes, Delete",
         onPress: () => {
-          deleteDoc(doc(db, "tasks", `tasks${key}`)).catch((err) => {
+          deleteDoc(doc(db, `${userUid}`, `tasks${key}`)).catch((err) => {
             alert(err);
           });
           alert("Deleted Your Task");
@@ -268,7 +269,10 @@ export default function Home({ navigation }) {
     //   JSK
     return (
       <>
-        <StatusBar backgroundColor="#009387" barStyle="light-content" />
+        <StatusBar
+          backgroundColor={theme == "dark" ? "#000" : "#fff"}
+          barStyle={theme == "dark" ? "light-content" : "dark-content"}
+        />
         <SafeAreaView>
           <FlatHeader
             leftText={
@@ -363,6 +367,8 @@ export default function Home({ navigation }) {
       <Header
         rightIconOnPress={() => actionSheetRef.current?.setModalVisible()}
       />
+
+      {/* RENDERING TASKS */}
       {!tasks.length < 1 ? (
         <>
           <View
@@ -372,76 +378,99 @@ export default function Home({ navigation }) {
               <Text style={theme == "dark" ? darkMode.title : lightMode.title}>
                 Tasks
               </Text>
-              <Text style={{ color: "dodgerblue" }}>
+              <Text style={{ color: "dodgerblue", paddingTop: 20 }}>
                 Swipe Left The Task And Click The Trash Icon To Delete
+              </Text>
+              <Text style={{ color: "dodgerblue", paddingTop: 10 }}>
+                Click the Task To See the detailed description
               </Text>
             </View>
             {/* RENDERING TASKS */}
             <View style={{ alignItems: "center", marginTop: 20 }}>
-              <SwipeListView
-                data={tasks}
-                renderItem={(data, rowMap) => (
-                  <View style={{ marginBottom: 10 }}>
+              <Animatable.View animation="slideInRight" duration={1300}>
+                <SwipeListView
+                  data={tasks}
+                  renderItem={(data, rowMap) => (
+                    <View style={{ marginBottom: 10 }}>
+                      <View
+                        style={{
+                          padding: 10,
+                          borderWidth: 1,
+                          borderTopRightRadius: 5,
+                          borderBottomEndRadius: 5,
+                          borderColor: theme == "dark" ? "#ccc" : "#000",
+                          height: 40,
+                          width: width - 30,
+                          backgroundColor: theme == "dark" ? "#ccc" : "#000",
+                          flexDirection: "row",
+                        }}
+                      >
+                        <View
+                          style={{
+                            backgroundColor: data.item.priorityColor,
+                            height: 20,
+                            width: 20,
+                            borderRadius: 3,
+                            marginRight: 10,
+                          }}
+                        />
+                        <Text
+                          style={{
+                            color: theme == "dark" ? "#000" : "#34ebd5",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {data.item.title}
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+                  renderHiddenItem={(data, rowMap) => (
                     <View
                       style={{
                         padding: 10,
-                        borderWidth: 1,
-                        borderTopRightRadius: 5,
-                        borderBottomEndRadius: 5,
-                        borderColor: theme == "dark" ? "#ccc" : "#000",
-                        height: 40,
-                        width: width - 30,
-                        backgroundColor: theme == "dark" ? "#ccc" : "#000",
+                        backgroundColor: "black",
                         flexDirection: "row",
+                        width: 100,
+                        justifyContent: "space-between",
+                        height: 40,
+                        borderTopLeftRadius: 20,
+                        borderBottomLeftRadius: 20,
+                        borderColor: theme == "dark" ? "#ccc" : "#000",
+                        borderWidth: 1,
                       }}
                     >
-                      <View
+                      <TouchableOpacity
+                        onPress={() => deleteTask(data.item.key)}
                         style={{
-                          backgroundColor: data.item.priorityColor,
-                          height: 20,
-                          width: 20,
-                          borderRadius: 3,
-                          marginRight: 10,
-                        }}
-                      />
-                      <Text
-                        style={{
-                          color: theme == "dark" ? "#000" : "#34ebd5",
-                          fontWeight: "bold",
+                          borderRightWidth: 1,
+                          borderColor: "#fff",
+                          paddingRight: 20,
                         }}
                       >
-                        {data.item.title}
-                      </Text>
+                        <Ionicons
+                          name="trash-outline"
+                          size={18}
+                          color="#ff3232"
+                        />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() =>
+                          navigation.navigate("DetailedTask", data.item)
+                        }
+                      >
+                        <Ionicons
+                          name="eye-outline"
+                          size={20}
+                          color="#00ff00"
+                        />
+                      </TouchableOpacity>
                     </View>
-                  </View>
-                )}
-                renderHiddenItem={(data, rowMap) => (
-                  <TouchableOpacity
-                    style={{
-                      padding: 10,
-                      backgroundColor: "black",
-                      flexDirection: "row",
-                      width: 60,
-                      justifyContent: "space-between",
-                      height: 40,
-                      borderTopLeftRadius: 20,
-                      borderBottomLeftRadius: 20,
-                      borderColor: theme == "dark" ? "#ccc" : "#000",
-                      borderWidth: 1,
-                    }}
-                    onPress={() => deleteTask(data.item.key)}
-                  >
-                    <Ionicons
-                      name="trash-outline"
-                      size={19}
-                      color="#ff3232"
-                      style={{ paddingLeft: 13 }}
-                    />
-                  </TouchableOpacity>
-                )}
-                leftOpenValue={65}
-                rightOpenValue={0}
-              />
+                  )}
+                  leftOpenValue={105}
+                  rightOpenValue={0}
+                />
+              </Animatable.View>
             </View>
           </View>
         </>

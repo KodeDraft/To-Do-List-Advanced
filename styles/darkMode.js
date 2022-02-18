@@ -1,13 +1,16 @@
 import { StyleSheet, Dimensions } from "react-native";
 
-const primaryColor = "#ff7878";
-
+// GETTING THE HEIGHT OF THE SCREEN
 const { height } = Dimensions.get("window");
-const { width } = Dimensions.get("window");
 
+// CENTER OF THE SCREEN
 const centerHeight = height / 2;
 
+// DEFAULT COLOR FOR THE ADD TASK MODAL
+const primaryColor = "#ff7878";
+
 const darkMode = StyleSheet.create({
+  // COMMON
   container: {
     backgroundColor: "#000",
     height: "100%",
@@ -88,6 +91,49 @@ const darkMode = StyleSheet.create({
     textAlign: "center",
     lineHeight: centerHeight,
     color: "#fff",
+  },
+  // DETAILED TASK STYLES
+
+  header: {
+    width: "100%",
+    height: 50,
+  },
+  taskContainer: {
+    backgroundColor: "#000",
+    height: "40%",
+    marginTop: 20,
+    width: "90%",
+    alignSelf: "center",
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#fff",
+  },
+  taskTitle: {
+    color: "black",
+    fontSize: 40,
+    textAlign: "center",
+    paddingTop: 20,
+    fontWeight: "bold",
+    paddingBottom: 20,
+  },
+  label: {
+    color: "#fff",
+    marginHorizontal: 20,
+    marginVertical: 10,
+    fontSize: 20,
+  },
+  customDelBtn: {
+    backgroundColor: "red",
+    padding: 15,
+    alignSelf: "center",
+    width: "90%",
+    marginTop: 20,
+  },
+  customDelBtnText: {
+    textAlign: "center",
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
   },
 });
 

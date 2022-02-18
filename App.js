@@ -5,12 +5,14 @@ import { Text, View } from "react-native";
 import SignUp from "./screens/SignUp";
 import SignIn from "./screens/SignIn";
 import Home from "./screens/Home";
+import DetailedTask from "./screens/DetailedTask";
+
 // NAVIGATION IMPORTS
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 // CONFIG => FIREBASE CONFIG
 import firebaseConfig from "./config/firebaseConfig";
-import CheckScreen from "./CheckScreen";
+
 // STACKS
 const Stack = createNativeStackNavigator();
 
@@ -24,7 +26,7 @@ export default function App() {
         <Stack.Screen name="SignIn" component={SignIn} />
         <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="CheckScreen" component={CheckScreen} />
+        <Stack.Screen name="DetailedTask" component={DetailedTask} />
       </Stack.Navigator>
     </NavigationContainer>
   );

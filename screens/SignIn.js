@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,7 +13,6 @@ import {
 } from "react-native";
 // ANIMATION
 import * as Animatable from "react-native-animatable";
-// LINEAR GRADIENT
 // ICONS
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Feather from "react-native-vector-icons/Feather";
@@ -25,10 +24,19 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
 } from "firebase/auth";
-import { initializeApp } from "firebase/app";
-import firebaseConfig from "../config/firebaseConfig";
 
 const SignIn = ({ navigation }) => {
+  // CHECKING IF USER IS THERE
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        navigation.navigate("Home");
+      } else {
+        navigation.navigate("SignIn");
+      }
+    });
+  }, [auth]);
+
   // USER DATA => USER NAME AND STUFF
   const [data, setData] = React.useState({
     username: "",
@@ -129,9 +137,20 @@ const SignIn = ({ navigation }) => {
         setErrorMessage(null);
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        setErrorMessage(errorCode);
+        let errorCode = error.code;
+        let errorMessage = error.message;
+
+        if (errorCode == "auth/wrong-password") {
+          setErrorMessage("Incorrect Password");
+        } else if (errorCode == "auth/user-not-found") {
+          setErrorMessage("User Not Found, Register To Continue");
+        } else if (errorCode == "auth/too-many-requests") {
+          setErrorMessage(
+            "You have Signed In To Many Times Within 24hrs. try again after some time"
+          );
+        } else {
+          setErrorMessage(errorCode);
+        }
 
         scrollTop();
       });

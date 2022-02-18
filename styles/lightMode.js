@@ -1,11 +1,11 @@
 import { StyleSheet, Dimensions } from "react-native";
 
 const { height } = Dimensions.get("window");
-const { width } = Dimensions.get("window");
 
 const centerHeight = height / 2;
 
 const lightMode = StyleSheet.create({
+  // COMMON
   container: {
     backgroundColor: "#fff",
     height: "100%",
@@ -17,7 +17,7 @@ const lightMode = StyleSheet.create({
     color: "dodgerblue",
     fontWeight: "bold",
   },
-  // ADD TASK MODAL
+  // ADD TASK MODAL STYLES
   addToDoTitle: {
     color: "#005A9C",
     textAlign: "center",
@@ -26,8 +26,6 @@ const lightMode = StyleSheet.create({
   },
   form: {
     paddingHorizontal: 20,
-    borderWidth: 2,
-    borderColor: "#000",
   },
   formInput: {
     borderWidth: 1,
@@ -85,6 +83,49 @@ const lightMode = StyleSheet.create({
     textAlign: "center",
     lineHeight: centerHeight,
     color: "#000",
+  },
+  // DETAILED TASK STYLES
+  header: {
+    width: "100%",
+    height: 50,
+  },
+  taskContainer: {
+    backgroundColor: "#fff",
+    // height: "40%",
+    paddingBottom: 40,
+    marginTop: 20,
+    width: "90%",
+    alignSelf: "center",
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "red",
+  },
+  taskTitle: {
+    color: "black",
+    fontSize: 40,
+    textAlign: "center",
+    paddingTop: 20,
+    fontWeight: "bold",
+    paddingBottom: 20,
+  },
+  label: {
+    color: "#000",
+    marginHorizontal: 20,
+    marginVertical: 10,
+    fontSize: 20,
+  },
+  customDelBtn: {
+    backgroundColor: "red",
+    padding: 15,
+    alignSelf: "center",
+    width: "90%",
+    marginTop: 20,
+  },
+  customDelBtnText: {
+    textAlign: "center",
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
   },
 });
 
