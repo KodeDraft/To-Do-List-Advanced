@@ -26,6 +26,8 @@ const lightMode = StyleSheet.create({
   },
   form: {
     paddingHorizontal: 20,
+    borderWidth: 2,
+    borderColor: "#000",
   },
   formInput: {
     borderWidth: 1,

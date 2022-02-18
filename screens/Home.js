@@ -12,7 +12,7 @@ import {
   Alert,
 } from "react-native";
 // FIREBASE
-import { getAuth } from "firebase/auth";
+import { getAuth, signOut } from "firebase/auth";
 // FIREBASE
 import {
   collection,
@@ -48,7 +48,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { SwipeListView } from "react-native-swipe-list-view";
 // AWESOME ALERT => INSTALLED
 
-export default function Home() {
+export default function Home({ navigation }) {
   useEffect(() => {
     showDate();
     showTime();
@@ -184,7 +184,7 @@ export default function Home() {
     const key = Date.now();
     const documentName = `tasks${key}`;
 
-    await setDoc(doc(db, "tasks", documentName), {
+    await setDoc(doc(db, `${userUid}`, documentName), {
       title: newTaskTitle,
       desc: newTaskDesc,
       priority: priority,
@@ -212,7 +212,7 @@ export default function Home() {
   };
   const getData = () => {
     // COLLECTION REFERENCE
-    const colRef = collection(db, "tasks");
+    const colRef = collection(db, `${userUid}`);
     // QUERING
     const q = query(colRef, orderBy("key", "desc"));
 
@@ -228,6 +228,17 @@ export default function Home() {
     });
   };
 
+  const logOut = async () => {
+    signOut(auth)
+      .then(() => {
+        // Sign-out successful.
+        navigation.navigate("SignIn");
+      })
+      .catch((error) => {
+        // An error happened.
+        alert(error);
+      });
+  };
   // DELETING TASK
   const deleteTask = async (key) => {
     Alert.alert("Are u sure ?", "You want to delete this task", [
@@ -261,7 +272,7 @@ export default function Home() {
         <SafeAreaView>
           <FlatHeader
             leftText={
-              <TouchableOpacity onPress={(event) => {}}>
+              <TouchableOpacity onPress={logOut}>
                 <Ionicons
                   name="log-out-outline"
                   size={34}
@@ -332,8 +343,9 @@ export default function Home() {
   const [isEnabled, setIsEnabled] = useState(false);
 
   // FIREBASE
-  const auth = getAuth(); //auth
-  const user = auth.currentUser; //auth.currentuser
+  const auth = getAuth();
+  const user = auth.currentUser;
+  const userUid = user.uid;
   const db = getFirestore(); //getFirestore()
 
   // THEME PROPERTIES

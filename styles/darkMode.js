@@ -21,7 +21,6 @@ const darkMode = StyleSheet.create({
   },
   // ADD TASK MODAL
   addToDoTitle: {
-    // color: "#ff7878",
     color: primaryColor,
     textAlign: "center",
     marginTop: 20,
@@ -30,6 +29,8 @@ const darkMode = StyleSheet.create({
   form: {
     paddingHorizontal: 20,
     backgroundColor: "#000",
+    borderWidth: 2,
+    borderColor: primaryColor,
   },
   formInput: {
     borderWidth: 1,
