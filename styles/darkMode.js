@@ -1,4 +1,11 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+
+const primaryColor = "#ff7878";
+
+const { height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
+
+const centerHeight = height / 2;
 
 const darkMode = StyleSheet.create({
   container: {
@@ -14,8 +21,8 @@ const darkMode = StyleSheet.create({
   },
   // ADD TASK MODAL
   addToDoTitle: {
-    // color: "#ff9e1f",
-    color: "#ff9e1f",
+    // color: "#ff7878",
+    color: primaryColor,
     textAlign: "center",
     marginTop: 20,
     fontSize: 35,
@@ -26,8 +33,8 @@ const darkMode = StyleSheet.create({
   },
   formInput: {
     borderWidth: 1,
-    borderColor: "#ff9e1f",
-    color: "#ff9e1f",
+    borderColor: primaryColor,
+    color: primaryColor,
     fontWeight: "bold",
     height: 35,
     marginTop: 20,
@@ -35,13 +42,13 @@ const darkMode = StyleSheet.create({
     paddingLeft: 10,
   },
   formLabel: {
-    color: "#ff9e1f",
+    color: primaryColor,
     textAlign: "left",
     fontSize: 20,
     paddingTop: 20,
   },
   customAddBtn: {
-    backgroundColor: "#ff9e1f",
+    backgroundColor: primaryColor,
     height: 30,
     marginTop: 20,
     borderRadius: 3,
@@ -72,9 +79,14 @@ const darkMode = StyleSheet.create({
     lineHeight: 30,
   },
   taskPriorityText: {
-    color: "#ff9e1f",
+    color: primaryColor,
     fontSize: 20,
     fontFamily: "descText",
+  },
+  noTasksTxt: {
+    textAlign: "center",
+    lineHeight: centerHeight,
+    color: "#fff",
   },
 });
 

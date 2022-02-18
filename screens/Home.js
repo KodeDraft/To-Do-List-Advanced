@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createRef } from "react";
+import React, { useState, useEffect, createRef, useRef } from "react";
 // NATIVE IMPORTS
 import {
   View,
@@ -9,6 +9,7 @@ import {
   Dimensions,
   TextInput,
   ScrollView,
+  Alert,
 } from "react-native";
 // FIREBASE
 import { getAuth } from "firebase/auth";
@@ -16,6 +17,7 @@ import { getAuth } from "firebase/auth";
 import {
   collection,
   doc,
+  deleteDoc,
   setDoc,
   addDoc,
   getFirestore,
@@ -44,13 +46,13 @@ import { FlatHeader } from "react-native-flat-header";
 import { SafeAreaView } from "react-native-safe-area-context";
 // SWIPE LIST VIEW
 import { SwipeListView } from "react-native-swipe-list-view";
+// AWESOME ALERT => INSTALLED
 
 export default function Home() {
   useEffect(() => {
     showDate();
     showTime();
     getData();
-    getFinishedData();
   }, []);
 
   // SCREEN WITH AND HEIGHT
@@ -179,23 +181,20 @@ export default function Home() {
     setPriorityColor("");
   };
   const addData = async () => {
-    await addDoc(collection(db, "tasks"), {
+    const key = Date.now();
+    const documentName = `tasks${key}`;
+
+    await setDoc(doc(db, "tasks", documentName), {
       title: newTaskTitle,
       desc: newTaskDesc,
       priority: priority,
       priorityColor: priorityColor,
       date: fullDate,
       time: fullTime,
-      key: Date.now(),
-    })
-      .then(() => {
-        closeAddToDo();
-        resetForm();
-        alert("Added Your Task");
-      })
-      .catch((err) => {
-        alert(err);
-      });
+      key: key,
+    }).catch((err) => {
+      alert(err);
+    });
   };
   const addTask = async () => {
     if (newTaskTitle.length < 1) {
@@ -206,6 +205,9 @@ export default function Home() {
       alert("Select Priority");
     } else {
       addData();
+      closeAddToDo();
+      resetForm();
+      alert("Added Your Task");
     }
   };
   const getData = () => {
@@ -224,6 +226,26 @@ export default function Home() {
       });
       setTasks(recievedTasks);
     });
+  };
+
+  // DELETING TASK
+  const deleteTask = async (key) => {
+    Alert.alert("Are u sure ?", "You want to delete this task", [
+      {
+        text: "No, Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      {
+        text: "Yes, Delete",
+        onPress: () => {
+          deleteDoc(doc(db, "tasks", `tasks${key}`)).catch((err) => {
+            alert(err);
+          });
+          alert("Deleted Your Task");
+        },
+      },
+    ]);
   };
 
   // JSK COMPONENTS
@@ -266,7 +288,12 @@ export default function Home() {
               />
             }
             large
-            style={{ height: 70, backgroundColor: headerBackground }}
+            style={{
+              height: 70,
+              backgroundColor: headerBackground,
+              borderBottomWidth: 1,
+              borderColor: theme == "dark" ? "#fff" : "#ccc",
+            }}
           />
         </SafeAreaView>
       </>
@@ -279,44 +306,7 @@ export default function Home() {
   const actionSheetRef = createRef();
 
   // MAIN -> IMPORTANT
-  const [tasks, setTasks] = useState([
-    {
-      title: "Task1",
-      priority: "high",
-      priorityColor: "red",
-      key: 1,
-    },
-    {
-      title: "Task2",
-      priority: "medium",
-      priorityColor: "orange",
-      key: 2,
-    },
-    {
-      title: "Task3",
-      priority: "low",
-      priorityColor: "dodgerblue",
-      key: 3,
-    },
-    {
-      title: "Task4",
-      priority: "low",
-      priorityColor: "red",
-      key: 4,
-    },
-    {
-      title: "Task5",
-      priority: "low",
-      priorityColor: "dodgerblue",
-      key: 5,
-    },
-    {
-      title: "Task6",
-      priority: "low",
-      priorityColor: "orange",
-      key: 6,
-    },
-  ]);
+  const [tasks, setTasks] = useState([]);
 
   // FORM VARIABLES
 
@@ -335,8 +325,8 @@ export default function Home() {
   // HEADER VARIABLES
 
   // THEME PROPERTIES
-  const [headerBackground, setHeaderBackground] = useState("#000");
-  const [headerContentColor, setHeaderContentColor] = useState("#fff");
+  const [headerBackground, setHeaderBackground] = useState("");
+  const [headerContentColor, setHeaderContentColor] = useState("");
 
   // SWITCH
   const [isEnabled, setIsEnabled] = useState(false);
@@ -360,219 +350,188 @@ export default function Home() {
     <>
       <Header
         rightIconOnPress={() => actionSheetRef.current?.setModalVisible()}
-        // rightIconOnPress={addTask}
       />
-      <View style={theme == "dark" ? darkMode.container : lightMode.container}>
-        <View style={{ flex: 0, marginTop: 60, marginLeft: 20 }}>
-          <Text style={theme == "dark" ? darkMode.title : lightMode.title}>
-            Tasks
-          </Text>
-          <Text style={{ color: "dodgerblue" }}>
-            Swipe Left To Delete And Finish Task
-          </Text>
-        </View>
-        {/* RENDERING TASKS */}
-        <View style={{ alignItems: "center", marginTop: 20 }}>
-          <SwipeListView
-            data={tasks}
-            renderItem={(data, rowMap) => (
-              <View style={{ marginBottom: 10 }}>
-                <View
-                  style={{
-                    padding: 10,
-                    borderWidth: 1,
-                    borderTopRightRadius: 5,
-                    borderBottomEndRadius: 5,
-                    borderColor: theme == "dark" ? "#ccc" : "#000",
-                    height: 40,
-                    width: width - 30,
-                    backgroundColor: theme == "dark" ? "#ccc" : "#000",
-                    flexDirection: "row",
-                  }}
-                >
-                  <View
-                    style={{
-                      backgroundColor: data.item.priorityColor,
-                      height: 20,
-                      width: 20,
-                      borderRadius: 3,
-                      marginRight: 10,
-                    }}
-                  />
-                  <Text
-                    style={{
-                      color: theme == "dark" ? "#000" : "#34ebd5",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {data.item.title}
-                  </Text>
-                </View>
-              </View>
-            )}
-            renderHiddenItem={(data, rowMap) => (
-              <View
-                style={{
-                  padding: 10,
-                  backgroundColor: "black",
-                  flexDirection: "row",
-                  width: 100,
-                  justifyContent: "space-between",
-                  height: 40,
-                  borderTopLeftRadius: 20,
-                  borderBottomLeftRadius: 20,
-                  borderColor: theme == "dark" ? "#ccc" : "#000",
-                  borderWidth: 1,
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => alert("Deleting Task On Process")}
-                  style={{
-                    borderRightWidth: 1,
-                    borderColor: "#fff",
-                    paddingRight: 20,
-                  }}
-                >
-                  <Ionicons name="trash-outline" size={18} color="#ff3232" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => alert("Finishing task is on process")}
-                >
-                  <Ionicons
-                    name="checkmark-done-outline"
-                    size={20}
-                    color="#00ff00"
-                  />
-                </TouchableOpacity>
-              </View>
-            )}
-            leftOpenValue={105}
-            rightOpenValue={0}
-          />
-        </View>
-      </View>
-
-      {/* THE SHEET THAT'S POP UP'S TO ADD TASK */}
-      <ActionSheet ref={actionSheetRef}>
-        <ScrollView>
+      {!tasks.length < 1 ? (
+        <>
           <View
-            style={{
-              height: "40%",
-              backgroundColor: theme == "dark" ? "#000" : "#fff",
-            }}
+            style={theme == "dark" ? darkMode.container : lightMode.container}
           >
-            {/* ADD TASK SECTION TITLE */}
-            <Text
-              style={
-                theme == "dark" ? darkMode.addToDoTitle : lightMode.addToDoTitle
-              }
-            >
-              Add Task
-            </Text>
-
-            <View style={theme == "dark" ? darkMode.form : lightMode.form}>
-              {/* ADD TASK FORM */}
-              {/* TASK TITLE INPUT */}
-              <TextInput
-                placeholder="Enter Task Title"
-                placeholderTextColor={theme == "dark" ? "#ff9e1f" : "#005A9C"}
-                style={
-                  theme == "dark" ? darkMode.formInput : lightMode.formInput
-                }
-                onChangeText={(title) => setNewTaskTitle(title)}
-                value={newTaskTitle}
-              />
-              {/* TASK DESC INPUT */}
-              <TextInput
-                placeholder="Enter Task Description"
-                placeholderTextColor={theme == "dark" ? "#ff9e1f" : "#005A9C"}
-                style={
-                  theme == "dark" ? darkMode.formInput : lightMode.formInput
-                }
-                onChangeText={(desc) => setNewTaskDesc(desc)}
-                value={newTaskDesc}
-              />
-              {/* TASK ENTERED DATE */}
-              <Text
-                style={
-                  theme == "dark" ? darkMode.formLabel : lightMode.formLabel
-                }
-              >
-                Current Date: {fullDate}
+            <View style={{ flex: 0, marginTop: 60, marginLeft: 20 }}>
+              <Text style={theme == "dark" ? darkMode.title : lightMode.title}>
+                Tasks
               </Text>
-              {/* TASK ENTERED TIME */}
-              <Text
-                style={
-                  theme == "dark" ? darkMode.formLabel : lightMode.formLabel
-                }
-              >
-                Current Time: {fullTime}
+              <Text style={{ color: "dodgerblue" }}>
+                Swipe Left The Task And Click The Trash Icon To Delete
               </Text>
-
-              <View style={{ paddingBottom: 10 }} />
-              <View style={{ marginLeft: -10 }}>
-                <CheckBox
-                  title="High"
-                  checked={high}
-                  checkedColor="#FF0000"
-                  onPress={setHighPriority}
-                />
-                <CheckBox
-                  title="Medium"
-                  checked={medium}
-                  checkedColor="#fab802"
-                  onPress={setMediumPriority}
-                />
-                <CheckBox
-                  title="Low"
-                  checked={low}
-                  checkedColor="#12a33b"
-                  onPress={setLowPriority}
-                />
-              </View>
-
-              {/* ADDING TASK BUTTON */}
-              <TouchableOpacity
-                style={
-                  theme == "dark"
-                    ? darkMode.customAddBtn
-                    : lightMode.customAddBtn
-                }
-                onPress={addTask}
-              >
-                <Text
-                  style={
-                    theme == "dark"
-                      ? darkMode.customAddBtnText
-                      : lightMode.customAddBtnText
-                  }
-                >
-                  ADD
-                </Text>
-              </TouchableOpacity>
-
-              {/* CLOSING ACTION SHEET BUTTON */}
-              <TouchableOpacity
-                style={
-                  theme == "dark"
-                    ? darkMode.customCloseBtn
-                    : lightMode.customCloseBtn
-                }
-                onPress={closeAddToDo}
-              >
-                <Text
-                  style={
-                    theme == "dark"
-                      ? darkMode.customCloseBtnText
-                      : lightMode.customCloseBtnText
-                  }
-                >
-                  CLOSE
-                </Text>
-              </TouchableOpacity>
+            </View>
+            {/* RENDERING TASKS */}
+            <View style={{ alignItems: "center", marginTop: 20 }}>
+              <SwipeListView
+                data={tasks}
+                renderItem={(data, rowMap) => (
+                  <View style={{ marginBottom: 10 }}>
+                    <View
+                      style={{
+                        padding: 10,
+                        borderWidth: 1,
+                        borderTopRightRadius: 5,
+                        borderBottomEndRadius: 5,
+                        borderColor: theme == "dark" ? "#ccc" : "#000",
+                        height: 40,
+                        width: width - 30,
+                        backgroundColor: theme == "dark" ? "#ccc" : "#000",
+                        flexDirection: "row",
+                      }}
+                    >
+                      <View
+                        style={{
+                          backgroundColor: data.item.priorityColor,
+                          height: 20,
+                          width: 20,
+                          borderRadius: 3,
+                          marginRight: 10,
+                        }}
+                      />
+                      <Text
+                        style={{
+                          color: theme == "dark" ? "#000" : "#34ebd5",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {data.item.title}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+                renderHiddenItem={(data, rowMap) => (
+                  <TouchableOpacity
+                    style={{
+                      padding: 10,
+                      backgroundColor: "black",
+                      flexDirection: "row",
+                      width: 60,
+                      justifyContent: "space-between",
+                      height: 40,
+                      borderTopLeftRadius: 20,
+                      borderBottomLeftRadius: 20,
+                      borderColor: theme == "dark" ? "#ccc" : "#000",
+                      borderWidth: 1,
+                    }}
+                    onPress={() => deleteTask(data.item.key)}
+                  >
+                    <Ionicons
+                      name="trash-outline"
+                      size={19}
+                      color="#ff3232"
+                      style={{ paddingLeft: 13 }}
+                    />
+                  </TouchableOpacity>
+                )}
+                leftOpenValue={65}
+                rightOpenValue={0}
+              />
             </View>
           </View>
-        </ScrollView>
+        </>
+      ) : (
+        <View
+          style={theme == "dark" ? darkMode.container : lightMode.container}
+        >
+          <Text
+            style={theme == "dark" ? darkMode.noTasksTxt : lightMode.noTasksTxt}
+          >
+            No Task ☹️.. Click The Add Button to Add Tasks
+          </Text>
+        </View>
+      )}
+      {/* THE SHEET THAT'S POP UP'S TO ADD TASK */}
+      <ActionSheet ref={actionSheetRef}>
+        <View style={theme == "dark" ? darkMode.form : lightMode.form}>
+          <TextInput
+            placeholder="Enter Task Title"
+            placeholderTextColor={theme == "dark" ? "#ff7878" : "#005A9C"}
+            style={theme == "dark" ? darkMode.formInput : lightMode.formInput}
+            onChangeText={(title) => setNewTaskTitle(title)}
+            value={newTaskTitle}
+          />
+
+          <TextInput
+            placeholder="Enter Task Description"
+            placeholderTextColor={theme == "dark" ? "#ff7878" : "#005A9C"}
+            style={theme == "dark" ? darkMode.formInput : lightMode.formInput}
+            onChangeText={(desc) => setNewTaskDesc(desc)}
+            value={newTaskDesc}
+          />
+
+          <Text
+            style={theme == "dark" ? darkMode.formLabel : lightMode.formLabel}
+          >
+            Current Date: {fullDate}
+          </Text>
+
+          <Text
+            style={theme == "dark" ? darkMode.formLabel : lightMode.formLabel}
+          >
+            Current Time: {fullTime}
+          </Text>
+
+          <View style={{ paddingBottom: 10 }} />
+
+          <CheckBox
+            title="High"
+            checked={high}
+            checkedColor="#FF0000"
+            onPress={setHighPriority}
+          />
+          <CheckBox
+            title="Medium"
+            checked={medium}
+            checkedColor="#fab802"
+            onPress={setMediumPriority}
+          />
+          <CheckBox
+            title="Low"
+            checked={low}
+            checkedColor="#12a33b"
+            onPress={setLowPriority}
+          />
+
+          <TouchableOpacity
+            style={
+              theme == "dark" ? darkMode.customAddBtn : lightMode.customAddBtn
+            }
+            onPress={addTask}
+          >
+            <Text
+              style={
+                theme == "dark"
+                  ? darkMode.customAddBtnText
+                  : lightMode.customAddBtnText
+              }
+            >
+              ADD
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={
+              theme == "dark"
+                ? darkMode.customCloseBtn
+                : lightMode.customCloseBtn
+            }
+            onPress={closeAddToDo}
+          >
+            <Text
+              style={
+                theme == "dark"
+                  ? darkMode.customCloseBtnText
+                  : lightMode.customCloseBtnText
+              }
+            >
+              CLOSE
+            </Text>
+          </TouchableOpacity>
+        </View>
       </ActionSheet>
     </>
   );

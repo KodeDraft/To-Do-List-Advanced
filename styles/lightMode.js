@@ -1,4 +1,9 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+
+const { height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
+
+const centerHeight = height / 2;
 
 const lightMode = StyleSheet.create({
   container: {
@@ -27,7 +32,6 @@ const lightMode = StyleSheet.create({
     borderColor: "#005A9C",
     color: "#005A9C",
     fontWeight: "bold",
-    // padding: 10,
     height: 35,
     marginTop: 20,
     fontSize: 20,
@@ -74,6 +78,11 @@ const lightMode = StyleSheet.create({
     color: "#005A9C",
     fontSize: 20,
     fontFamily: "descText",
+  },
+  noTasksTxt: {
+    textAlign: "center",
+    lineHeight: centerHeight,
+    color: "#000",
   },
 });
 
