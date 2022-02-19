@@ -3,16 +3,13 @@ import React, { useState, useRef } from "react";
 import {
   View,
   Text,
-  Button,
   TouchableOpacity,
-  Dimensions,
   TextInput,
   Platform,
   StyleSheet,
   ScrollView,
   Image,
   StatusBar,
-  ActivityIndicator,
 } from "react-native";
 // ANIMATION
 import * as Animatable from "react-native-animatable";
@@ -419,3 +416,4 @@ const styles = StyleSheet.create({
 
 // EXPORTING
 export default SignUp;
+

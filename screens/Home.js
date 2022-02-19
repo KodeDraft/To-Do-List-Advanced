@@ -8,7 +8,6 @@ import {
   StatusBar,
   Dimensions,
   TextInput,
-  ScrollView,
   Alert,
 } from "react-native";
 // FIREBASE
@@ -55,6 +54,50 @@ export default function Home({ navigation }) {
     showTime();
     getData();
   }, []);
+
+  /* VARIABLES */
+  /* VARIABLES */
+
+  // ALERT'S
+  const [sucessVisible, setSucessVisible] = React.useState(false);
+  const [errorVisible, setErrorVisible] = React.useState(false);
+  const [errText, setErrText] = React.useState("All Inputs Are Required");
+  const actionSheetRef = createRef();
+
+  // MAIN -> IMPORTANT
+  const [tasks, setTasks] = useState([]);
+
+  // FORM VARIABLES
+
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskDesc, setNewTaskDesc] = useState("");
+  const [fullDate, setFullDate] = useState();
+  const [fullTime, setFullTime] = useState();
+
+  // PRIORITY USES
+  const [low, setLow] = useState(false);
+  const [high, setHigh] = useState(false);
+  const [medium, setMedium] = useState(false);
+  const [priority, setPriority] = useState(null);
+  const [priorityColor, setPriorityColor] = useState("");
+
+  // HEADER VARIABLES
+
+  // THEME PROPERTIES
+  const [headerBackground, setHeaderBackground] = useState("");
+  const [headerContentColor, setHeaderContentColor] = useState("");
+
+  // SWITCH
+  const [isEnabled, setIsEnabled] = useState(false);
+
+  // FIREBASE
+  const auth = getAuth();
+  const user = auth.currentUser;
+  const userUid = user.uid;
+  const db = getFirestore();
+
+  // THEME PROPERTIES
+  const [theme, setTheme] = useState();
 
   // SCREEN WITH AND HEIGHT
   const { width } = Dimensions.get("window");
@@ -317,50 +360,6 @@ export default function Home({ navigation }) {
       </>
     );
   }
-
-  /* VARIABLES */
-  /* VARIABLES */
-
-  // ALERT'S
-  const [sucessVisible, setSucessVisible] = React.useState(false);
-  const [errorVisible, setErrorVisible] = React.useState(false);
-  const [errText, setErrText] = React.useState("All Inputs Are Required");
-  const actionSheetRef = createRef();
-
-  // MAIN -> IMPORTANT
-  const [tasks, setTasks] = useState([]);
-
-  // FORM VARIABLES
-
-  const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [newTaskDesc, setNewTaskDesc] = useState("");
-  const [fullDate, setFullDate] = useState();
-  const [fullTime, setFullTime] = useState();
-
-  // PRIORITY USES
-  const [low, setLow] = useState(false);
-  const [high, setHigh] = useState(false);
-  const [medium, setMedium] = useState(false);
-  const [priority, setPriority] = useState(null);
-  const [priorityColor, setPriorityColor] = useState("");
-
-  // HEADER VARIABLES
-
-  // THEME PROPERTIES
-  const [headerBackground, setHeaderBackground] = useState("");
-  const [headerContentColor, setHeaderContentColor] = useState("");
-
-  // SWITCH
-  const [isEnabled, setIsEnabled] = useState(false);
-
-  // FIREBASE
-  const auth = getAuth();
-  const user = auth.currentUser;
-  const userUid = user.uid;
-  const db = getFirestore();
-
-  // THEME PROPERTIES
-  const [theme, setTheme] = useState();
 
   // USE EFFECTS
   useEffect(() => {

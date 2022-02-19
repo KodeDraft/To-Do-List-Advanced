@@ -100,3 +100,4 @@ export default function DetailedTask(props) {
 }
 
 const detailedTaskStyles = StyleSheet.create({});
+
