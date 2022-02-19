@@ -23,6 +23,7 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   onAuthStateChanged,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 
 const SignIn = ({ navigation }) => {
@@ -155,6 +156,23 @@ const SignIn = ({ navigation }) => {
         scrollTop();
       });
   };
+  const forgotPassword = async () => {
+    sendPasswordResetEmail(auth, data.username)
+      .then(() => {
+        // Password reset email sent!
+        alert(
+          `An email has been sent to ${data.username}. you can change your password there`
+        );
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+
+        if (errorCode == "auth/invalid-email") {
+          alert("Check Your Email It Is Invalid");
+        }
+      });
+  };
   // JSK
   return (
     <View style={styles.container}>
@@ -266,6 +284,10 @@ const SignIn = ({ navigation }) => {
               </Text>
             </Animatable.View>
           )}
+
+          <TouchableOpacity onPress={forgotPassword}>
+            <Text style={styles.forgotTxt}>Forgot Password ?</Text>
+          </TouchableOpacity>
 
           <View style={styles.button}>
             <TouchableOpacity
@@ -404,6 +426,9 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "500",
     letterSpacing: 2,
+  },
+  forgotTxt: {
+    marginTop: 20,
   },
 });
 // !importing => EXPORTING

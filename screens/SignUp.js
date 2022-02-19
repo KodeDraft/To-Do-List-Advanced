@@ -27,7 +27,8 @@ import {
 } from "firebase/auth";
 // CONFIG
 import firebaseConfig from "../config/firebaseConfig";
-
+// ASYNC STORAGE
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const SignUp = ({ navigation }) => {
   // VARIABLES
 
@@ -139,6 +140,7 @@ const SignUp = ({ navigation }) => {
           photoURL:
             "https://apsec.iafor.org/wp-content/uploads/sites/37/2017/02/IAFOR-Blank-Avatar-Image.jpg",
         });
+
         navigation.navigate("Home");
       })
       // CATCHING THE ERROR

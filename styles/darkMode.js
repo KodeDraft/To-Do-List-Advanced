@@ -7,7 +7,9 @@ const { height } = Dimensions.get("window");
 const centerHeight = height / 2;
 
 // DEFAULT COLOR FOR THE ADD TASK MODAL
-const primaryColor = "#ff7878";
+// const primaryColor = "#ff7878";
+// #ff006a
+const primaryColor = "dodgerblue";
 
 const darkMode = StyleSheet.create({
   // COMMON
@@ -33,7 +35,9 @@ const darkMode = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: "#000",
     borderWidth: 2,
-    borderColor: primaryColor,
+    borderColor: "#fff",
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
   },
   formInput: {
     borderWidth: 1,
@@ -93,7 +97,6 @@ const darkMode = StyleSheet.create({
     color: "#fff",
   },
   // DETAILED TASK STYLES
-
   header: {
     width: "100%",
     height: 50,

@@ -24,8 +24,6 @@ import {
   query,
   orderBy,
   onSnapshot,
-  where,
-  FieldValue,
 } from "firebase/firestore";
 // ANIMATION
 import * as Animatable from "react-native-animatable";
@@ -48,6 +46,8 @@ import { FlatHeader } from "react-native-flat-header";
 import { SafeAreaView } from "react-native-safe-area-context";
 // SWIPE LIST VIEW
 import { SwipeListView } from "react-native-swipe-list-view";
+// ALERT => INSTALLED
+import { FancyAlert } from "react-native-expo-fancy-alerts";
 
 export default function Home({ navigation }) {
   useEffect(() => {
@@ -177,8 +177,12 @@ export default function Home({ navigation }) {
   const resetForm = () => {
     setNewTaskTitle("");
     setNewTaskDesc("");
-    setPriority("");
+    setPriority(null);
     setPriorityColor("");
+  };
+  const inputRequiredAlert = (err) => {
+    setErrorVisible(true);
+    setErrText(err);
   };
   const addData = async () => {
     const key = Date.now();
@@ -198,18 +202,18 @@ export default function Home({ navigation }) {
   };
   const addTask = async () => {
     if (newTaskTitle.length < 1) {
-      alert("Enter Task");
+      inputRequiredAlert("Enter Task");
     } else if (newTaskTitle.length > 25) {
-      alert("Task Title Should Be Less Than 25 Charecters");
+      inputRequiredAlert("Task Title Should Be Less Than 25 Charecters");
     } else if (newTaskDesc.length < 3) {
-      alert("Task Description Should Be More than 3 Charecters");
+      inputRequiredAlert("Task Description Should Be More than 3 Charecters");
     } else if (priority == null) {
-      alert("Select Priority");
+      inputRequiredAlert("Select Priority");
     } else {
       addData();
       closeAddToDo();
       resetForm();
-      alert("Added Your Task");
+      setSucessVisible(true);
     }
   };
   const getData = () => {
@@ -254,7 +258,6 @@ export default function Home({ navigation }) {
           deleteDoc(doc(db, `${userUid}`, `tasks${key}`)).catch((err) => {
             alert(err);
           });
-          alert("Deleted Your Task");
         },
       },
     ]);
@@ -318,6 +321,10 @@ export default function Home({ navigation }) {
   /* VARIABLES */
   /* VARIABLES */
 
+  // ALERT'S
+  const [sucessVisible, setSucessVisible] = React.useState(false);
+  const [errorVisible, setErrorVisible] = React.useState(false);
+  const [errText, setErrText] = React.useState("All Inputs Are Required");
   const actionSheetRef = createRef();
 
   // MAIN -> IMPORTANT
@@ -350,7 +357,7 @@ export default function Home({ navigation }) {
   const auth = getAuth();
   const user = auth.currentUser;
   const userUid = user.uid;
-  const db = getFirestore(); //getFirestore()
+  const db = getFirestore();
 
   // THEME PROPERTIES
   const [theme, setTheme] = useState();
@@ -382,7 +389,7 @@ export default function Home({ navigation }) {
                 Swipe Left The Task And Click The Trash Icon To Delete
               </Text>
               <Text style={{ color: "dodgerblue", paddingTop: 10 }}>
-                Click the Task To See the detailed description
+                Swipe Left The Task And Click The Eye Icon To View Detailed Task
               </Text>
             </View>
             {/* RENDERING TASKS */}
@@ -485,6 +492,7 @@ export default function Home({ navigation }) {
           </Text>
         </View>
       )}
+
       {/* THE SHEET THAT'S POP UP'S TO ADD TASK */}
       <ActionSheet ref={actionSheetRef}>
         <View style={theme == "dark" ? darkMode.form : lightMode.form}>
@@ -574,6 +582,113 @@ export default function Home({ navigation }) {
           </TouchableOpacity>
         </View>
       </ActionSheet>
+
+      {/* ALERT */}
+
+      {/* SUCESS ALERT */}
+      <FancyAlert
+        visible={sucessVisible}
+        icon={
+          <View
+            style={{
+              flex: 1,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "#26C281",
+              borderRadius: 50,
+              width: "100%",
+            }}
+          >
+            <Ionicons name="checkmark-done-circle" size={34} />
+          </View>
+        }
+        style={{
+          backgroundColor: theme == "dark" ? "#000" : "#fff",
+        }}
+      >
+        <Text
+          style={{
+            marginTop: -16,
+            marginBottom: 12,
+            color: theme == "dark" ? "#fff" : "#000",
+          }}
+        >
+          Task Added Sucessfully
+        </Text>
+
+        <TouchableOpacity
+          style={{
+            borderRadius: 32,
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingHorizontal: 8,
+            paddingVertical: 8,
+            alignSelf: "stretch",
+            backgroundColor: "#26C281",
+            minWidth: "50%",
+            paddingHorizontal: 16,
+            marginBottom: 20,
+          }}
+          onPress={() => setSucessVisible(false)}
+        >
+          <Text style={{ textAlign: "center", color: "#fff" }}>Great!</Text>
+        </TouchableOpacity>
+      </FancyAlert>
+
+      <FancyAlert
+        visible={errorVisible}
+        icon={
+          <View
+            style={{
+              flex: 1,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "#C3262A",
+              borderRadius: 50,
+              width: "100%",
+            }}
+          >
+            <Ionicons name="close-outline" size={34} color="#fff" />
+          </View>
+        }
+        style={{
+          backgroundColor: theme == "dark" ? "#000" : "#fff",
+        }}
+      >
+        <Text
+          style={{
+            marginTop: -16,
+            marginBottom: 12,
+            color: theme == "dark" ? "#fff" : "#000",
+          }}
+        >
+          {errText}
+        </Text>
+
+        <TouchableOpacity
+          style={{
+            borderRadius: 32,
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingHorizontal: 8,
+            paddingVertical: 8,
+            alignSelf: "stretch",
+            backgroundColor: "#C3262A",
+            minWidth: "50%",
+            paddingHorizontal: 16,
+            marginBottom: 20,
+          }}
+          onPress={() => setErrorVisible(false)}
+        >
+          <Text style={{ textAlign: "center", color: "#fff" }}>Ok</Text>
+        </TouchableOpacity>
+      </FancyAlert>
     </>
   );
 }
